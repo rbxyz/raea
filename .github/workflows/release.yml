@@ -8,6 +8,9 @@
 #   git tag -a v0.1.0 -m "raea 0.1.0" -m "skills-passed: <full sha>"
 # A tag with a suffix (v0.1.0-rc1, v0.1.0-canary.3) is made a pre-release; a plain version (v0.1.0) is a full release,
 # GitHub's latest. The release's notes are set by hand.
+# prisma: in the fork (rbxyz/raea) a release is tagged on our main as vX.Y.Z-prisma.N (annotated, with the upstream
+# tag's skills-passed line), attached to the fork's own releases, and checked with
+# `gh attestation verify raea-VERSION-linux-x86_64.tar.gz -R rbxyz/raea`.
 name: release
 
 on:
@@ -272,6 +275,8 @@ jobs:
           sha256sum -c "raea-$v-windows-x86_64.zip.sha256"
           bash "$RUNNER_TEMP/release-check.sh" "$PWD/raea-$v-windows-x86_64.zip" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: install.ps1, then a render from PATH
+        # prisma: the fork doesn't download and run the upstream's published installer (raea.io) in its CI
+        if: github.repository == 'shinyobjectz/raea'
         shell: pwsh
         run: |
           $v = $env:TAG.Substring(1)
